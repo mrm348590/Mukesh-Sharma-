@@ -1,0 +1,6 @@
+{
+  "name": "Earning Hub",
+  "description": "An immersive reward center to complete interactive tasks, watch short simulated videos, play simple captcha/math games, enter referral codes, and redeem exciting gift cards!",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
