@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earning Hub - Web Portal</title>
+    <!-- Google Fonts & Tailwind CSS for beautiful styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons for high-quality clean symbols -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0c10;
+            color: #e2e8f0;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111420;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #272a3d;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4f46e5;
+        }
+        /* Glassmorphism details */
+        .glass-card {
+            background: rgba(21, 24, 38, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        /* Sparkle animation */
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(245, 158, 11, 0.8);
+            }
+        }
+        .neon-glow {
+            animation: pulse-glow 2s infinite;
+        }
+        /* Scratch card canvas hover */
+        #scratch-canvas {
+            cursor: crosshair;
+        }
+        /* Spinner CSS transition */
+        .wheel-spin {
+            transition: transform 4s cubic-bezier(0.1, 0.8, 0.3, 1);
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+    <div class="flex h-screen w-screen overflow-hidden">
+        <!-- Sidebar for Wide Desktop Viewport -->
+        <aside class="hidden md:flex flex-col w-64 bg-[#111420] border-r border-gray-800 p-6 flex-shrink-0">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-600/30">
+                    <i data-lucide="coins" class="w-5 h-5 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg tracking-wide text-white">EARNING HUB</h1>
+                    <span class="text-xs text-indigo-400 font-bold uppercase tracking-widest">Web Portal</span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex-1 space-y-2">
+                <button onclick="switchTab('earn')" id="nav-earn" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 bg-indigo-600/15 text-indigo-400">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    <span>Earn Center</span>
+                </button>
+                <button onclick="switchTab('arcade')" id="nav-arcade" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 text-gray-400 hover:bg-gray-800/40 hover:text-white">
+                    <i data-lucide="gamepad-2" class="w-5 h-5"></i>
+                    <span>Arcade Blitz</span>
+                </button>
+                <button onclick="switchTab('redeem')" id="nav-redeem" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 text-gray-400 hover:bg-gray-800/40 hover:text-white">
+                    <i data-lucide="gift" class="w-5 h-5"></i>
+                    <span>Redeem Vouchers</span>
+                </button>
+                <button onclick="switchTab('invite')" id="nav-invite" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 text-gray-400 hover:bg-gray-800/40 hover:text-white">
+                    <i data-lucide="users-2" class="w-5 h-5"></i>
+                    <span>Invite Friends</span>
+                </button>
+                <button onclick="switchTab('history')" id="nav-history" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 text-gray-400 hover:bg-gray-800/40 hover:text-white">
+                    <i data-lucide="history" class="w-5 h-5"></i>
+                    <span>Ledger Logs</span>
+                </button>
+                <button onclick="switchTab('profile')" id="nav-profile" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-200 text-gray-400 hover:bg-gray-800/40 hover:text-white">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                    <span>My Profile</span>
+                </button>
+            </nav>
+
+            <!-- Bottom Branding -->
+            <div class="mt-auto border-t border-gray-800/60 pt-4">
+                <p class="text-xs text-gray-500">v2.1 Netlify Live Build</p>
+                <p class="text-[10px] text-gray-600 mt-1">Synced with Android App</p>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Container -->
+        <main class="flex-1 flex flex-col min-w-0 bg-[#0b0c10] overflow-y-auto pb-24 md:pb-6">
+            <!-- Header Bar -->
+            <header class="flex items-center justify-between px-6 py-4 bg-[#111420]/80 backdrop-blur-md sticky top-0 z-40 border-b border-gray-800/40">
+                <!-- Mobile Menu Info / Logo -->
+                <div class="flex items-center gap-3 md:hidden">
+                    <div class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center">
+                        <i data-lucide="coins" class="w-4 h-4 text-white"></i>
+                    </div>
+                    <span class="font-extrabold text-md text-white tracking-wide">EARNING HUB</span>
+                </div>
+
+                <div class="hidden md:block">
+                    <p class="text-xs text-gray-400">Welcome Back,</p>
+                    <h2 class="font-bold text-white text-sm" id="header-username">Gamer Pro</h2>
+                </div>
+
+                <!-- Points balance display -->
+                <div class="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-2xl shadow-md">
+                    <span class="text-amber-400 text-lg">🪙</span>
+                    <span class="font-extrabold text-amber-300 tracking-wide text-md" id="balance-value">0</span>
+                    <span class="text-xs text-amber-500 font-semibold uppercase ml-1">Coins</span>
+                </div>
+            </header>
+
+            <!-- Active tab viewports -->
+            <div class="p-6 max-w-5xl w-full mx-auto flex-1">
+                
+                <!-- ALERT BANNER -->
+                <div id="ui-alert" class="hidden mb-6 p-4 rounded-xl border flex items-center justify-between bg-emerald-500/10 border-emerald-500/30 text-emerald-400 text-sm font-semibold shadow-lg">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="info" class="w-5 h-5"></i>
+                        <span id="ui-alert-text">Alert message here</span>
+                    </div>
+                    <button onclick="dismissAlert()" class="text-emerald-400/80 hover:text-white">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- TAB: EARN CENTER -->
+                <section id="tab-earn" class="tab-content block space-y-6">
+                    <!-- Daily Check-in & Interactive widgets grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Daily Reward Card -->
+                        <div class="glass-card p-6 rounded-3xl relative overflow-hidden flex flex-col justify-between min-h-[200px]">
+                            <div class="absolute right-0 top-0 translate-x-4 -translate-y-4 opacity-10 text-9xl">📅</div>
+                            <div>
+                                <span class="text-indigo-400 text-xs font-bold tracking-widest uppercase">Daily Bonus</span>
+                                <h3 class="font-bold text-xl text-white mt-1">Claim Daily +100</h3>
+                                <p class="text-xs text-gray-400 mt-1">Log in daily to claim your free reward bonus coins.</p>
+                            </div>
+                            <div class="mt-4">
+                                <button onclick="claimDailyReward()" id="btn-daily" class="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold py-3 px-4 rounded-2xl shadow-lg transition-all duration-200">
+                                    Claim Now (+100 🪙)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Spin the Wheel Game -->
+                        <div class="glass-card p-6 rounded-3xl flex flex-col justify-between min-h-[200px]">
+                            <div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-amber-400 text-xs font-bold tracking-widest uppercase">Mini Game</span>
+                                    <span class="text-[10px] bg-amber-500/15 text-amber-400 px-2 py-0.5 rounded-full font-bold">Spin & Win</span>
+                                </div>
+                                <h3 class="font-bold text-xl text-white mt-1">Lucky Spin Wheel</h3>
+                                <p class="text-xs text-gray-400 mt-1">Test your luck and win up to 150 gold coins instantly.</p>
+                            </div>
+                            <div class="mt-4 flex items-center gap-4">
+                                <!-- Minimal interactive wheel graphics -->
+                                <div class="relative w-16 h-16 rounded-full border-4 border-gray-800 flex items-center justify-center overflow-hidden bg-indigo-950/40" id="spin-indicator">
+                                    <div class="absolute w-1 h-8 bg-amber-500 top-0 left-1/2 -translate-x-1/2 z-10 origin-bottom wheel-spin" id="wheel-arrow"></div>
+                                    <span class="text-lg z-20">🎡</span>
+                                </div>
+                                <button onclick="triggerSpinWheel()" id="btn-spin" class="flex-1 bg-amber-500 hover:bg-amber-400 text-black font-bold py-3 px-4 rounded-2xl shadow-lg transition-all duration-200 text-sm">
+                                    Spin Wheel
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Scratch Card Widget -->
+                        <div class="glass-card p-6 rounded-3xl flex flex-col justify-between min-h-[200px]">
+                            <div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-emerald-400 text-xs font-bold tracking-widest uppercase">Instant Win</span>
+                                    <span class="text-[10px] bg-emerald-500/15 text-emerald-400 px-2 py-0.5 rounded-full font-bold">Scratch Off</span>
+                                </div>
+                                <h3 class="font-bold text-xl text-white mt-1">Scratch & Reveal</h3>
+                                <p class="text-xs text-gray-400 mt-1">Swipe to scratch the silver card and reveal hidden cash prizes.</p>
+                            </div>
+                            <div class="mt-4 relative h-14 bg-gray-900 rounded-2xl border border-gray-800 flex items-center justify-center overflow-hidden">
+                                <div id="scratch-secret-text" class="absolute font-black text-amber-400 text-sm tracking-wide">REVEALED: +50 Coins!</div>
+                                <canvas id="scratch-canvas" class="absolute inset-0 w-full h-full rounded-2xl z-20"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task Offers Section -->
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-extrabold text-lg tracking-wide text-white flex items-center gap-2">
+                                <i data-lucide="clipboard-list" class="text-indigo-400 w-5 h-5"></i>
+                                Easy Tasks Hub
+                            </h3>
+                            <span class="text-xs text-gray-400">Updates hourly</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- Task 1 -->
+                            <div class="glass-card p-5 rounded-2xl flex flex-col justify-between">
+                                <div class="flex items-center justify-between">
+                                    <div class="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-400">
+                                        <i data-lucide="video" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full">+20 Coins</span>
+                                </div>
+                                <h4 class="font-bold text-white text-sm mt-3">Watch Video Ad Campaign</h4>
+                                <p class="text-xs text-gray-400 mt-1">Watch short sponsorship reels to verify your account engagement.</p>
+                                <button onclick="simulateTask('Watch Video Ad', 20)" class="mt-4 w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-xl text-xs transition-colors duration-150">
+                                    Start Video
+                                </button>
+                            </div>
+
+                            <!-- Task 2 -->
+                            <div class="glass-card p-5 rounded-2xl flex flex-col justify-between">
+                                <div class="flex items-center justify-between">
+                                    <div class="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+                                        <i data-lucide="download-cloud" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full">+120 Coins</span>
+                                </div>
+                                <h4 class="font-bold text-white text-sm mt-3">Download Sponsor App</h4>
+                                <p class="text-xs text-gray-400 mt-1">Install the companion gaming browser and complete setup to verify.</p>
+                                <button onclick="simulateTask('Download Sponsor App', 120)" class="mt-4 w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-xl text-xs transition-colors duration-150">
+                                    Install App
+                                </button>
+                            </div>
+
+                            <!-- Task 3 -->
+                            <div class="glass-card p-5 rounded-2xl flex flex-col justify-between">
+                                <div class="flex items-center justify-between">
+                                    <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full">+75 Coins</span>
+                                </div>
+                                <h4 class="font-bold text-white text-sm mt-3">Opinion Survey Quiz</h4>
+                                <p class="text-xs text-gray-400 mt-1">Share quick feedback answers regarding trending web games.</p>
+                                <button onclick="simulateTask('Opinion Survey Quiz', 75)" class="mt-4 w-full bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-3 rounded-xl text-xs transition-colors duration-150">
+                                    Fill Quiz
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB: ARCADE BLITZ -->
+                <section id="tab-arcade" class="tab-content hidden space-y-6">
+                    <div class="glass-card p-6 rounded-3xl border border-indigo-500/20">
+                        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs bg-red-500/15 text-red-400 px-2.5 py-0.5 rounded-full font-extrabold uppercase tracking-widest">Arcade Blitz Arena</span>
+                                    <span class="text-xs text-indigo-400 font-bold uppercase tracking-wider">+10 / HIT</span>
+                                </div>
+                                <h3 class="font-extrabold text-2xl text-white mt-1">Coin Tapper Arcade Blitz</h3>
+                                <p class="text-xs text-gray-400 mt-1">Rapidly tap the floating neon gold coin target as it teleports! Each hit earns +10 Coins inside our 15s speed blitz.</p>
+                            </div>
+                            
+                            <!-- Start / Action control -->
+                            <div id="game-promo-controls">
+                                <button onclick="startArcadeGame()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-black px-6 py-3 rounded-2xl shadow-xl shadow-indigo-600/20 text-sm tracking-wide transition-all duration-200">
+                                    Play Blitz Arena
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- LIVE GAME LAYOUT -->
+                        <div id="game-active-panel" class="hidden mt-6 space-y-4">
+                            <div class="flex items-center justify-between text-sm font-bold border-b border-gray-800/60 pb-3">
+                                <span class="text-red-400 flex items-center gap-1.5">
+                                    <i data-lucide="timer" class="w-4 h-4 animate-pulse"></i>
+                                    Blitz Timer: <span id="game-timer-val">15</span>s
+                                </span>
+                                <span class="text-amber-400 flex items-center gap-1.5">
+                                    <i data-lucide="target" class="w-4 h-4"></i>
+                                    Targets Hit: <span id="game-score-val">0</span>
+                                </span>
+                            </div>
+
+                            <!-- Live Progress Bar -->
+                            <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
+                                <div id="game-progress" class="bg-indigo-500 h-full w-full transition-all duration-1000"></div>
+                            </div>
+
+                            <!-- Active Tapper Bounded Arena -->
+                            <div class="relative w-full h-[220px] bg-slate-950/80 rounded-2xl border border-gray-800 overflow-hidden" id="game-arena">
+                                <!-- Floating coin item target -->
+                                <button id="game-target-coin" onclick="hitArcadeTarget()" class="absolute w-12 h-12 bg-amber-400 rounded-full border-2 border-white flex items-center justify-center text-xl shadow-lg transition-all duration-150 hover:scale-110 active:scale-90 select-none cursor-pointer">
+                                    🪙
+                                </button>
+                            </div>
+
+                            <div class="flex justify-end gap-2 pt-2">
+                                <button onclick="quitArcadeGame()" class="text-xs text-red-400 hover:text-red-300 font-bold px-4 py-2 border border-red-500/20 hover:border-red-500/40 rounded-xl transition-colors">
+                                    Quit Arena
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB: REDEEM VOUCHERS -->
+                <section id="tab-redeem" class="tab-content hidden space-y-6">
+                    <div>
+                        <h3 class="font-extrabold text-lg tracking-wide text-white flex items-center gap-2 mb-2">
+                            <i data-lucide="gift" class="text-amber-400 w-5 h-5"></i>
+                            Claim Vouchers Catalog
+                        </h3>
+                        <p class="text-xs text-gray-400">Convert your accumulated Earning Hub Gold Coins into real-world gift cards instantly.</p>
+                    </div>
+
+                    <!-- Vouchers Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Card 1 -->
+                        <div class="glass-card p-5 rounded-3xl flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-xs text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full font-bold">Play Gift</span>
+                                    <span class="text-[10px] text-gray-500 font-bold">1,000 Coins</span>
+                                </div>
+                                <h4 class="font-bold text-white text-lg mt-3">Google Play Voucher</h4>
+                                <p class="text-xs text-gray-400 mt-1">Get custom activation codes directly in your email inbox.</p>
+                                <span class="text-2xl font-black text-white mt-2 block">$10.00</span>
+                            </div>
+                            <button onclick="openRedeemForm('Google Play Voucher', 1000)" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-colors">
+                                Redeem Voucher
+                            </button>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="glass-card p-5 rounded-3xl flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-xs text-yellow-400 bg-yellow-500/10 px-2 py-0.5 rounded-full font-bold">Shopping</span>
+                                    <span class="text-[10px] text-gray-500 font-bold">2,500 Coins</span>
+                                </div>
+                                <h4 class="font-bold text-white text-lg mt-3">Amazon Gift Voucher</h4>
+                                <p class="text-xs text-gray-400 mt-1">Redeem balance for purchasing electronics, books, apparel.</p>
+                                <span class="text-2xl font-black text-white mt-2 block">$25.00</span>
+                            </div>
+                            <button onclick="openRedeemForm('Amazon Gift Voucher', 2500)" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-colors">
+                                Redeem Voucher
+                            </button>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="glass-card p-5 rounded-3xl flex flex-col justify-between">
+                            <div>
+                                <div class="flex justify-between items-start">
+                                    <span class="text-xs text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-full font-bold">Cashout</span>
+                                    <span class="text-[10px] text-gray-500 font-bold">1,500 Coins</span>
+                                </div>
+                                <h4 class="font-bold text-white text-lg mt-3">PayPal Balance Transfer</h4>
+                                <p class="text-xs text-gray-400 mt-1">Instantly cashout to your verified business or personal account.</p>
+                                <span class="text-2xl font-black text-white mt-2 block">$15.00</span>
+                            </div>
+                            <button onclick="openRedeemForm('PayPal Cashout', 1500)" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-colors">
+                                Redeem Voucher
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- MODAL REDEEM FORM -->
+                    <div id="redeem-modal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+                        <div class="glass-card p-6 rounded-3xl w-full max-w-md border border-gray-800 animate-in fade-in zoom-in-95 duration-200">
+                            <h4 class="font-extrabold text-lg text-white">Redeem Claim Request</h4>
+                            <p class="text-xs text-gray-400 mt-1">Confirming redemption for <span id="redeem-target-name" class="text-indigo-400 font-bold">Voucher</span> (Cost: <span id="redeem-target-cost" class="font-bold">0</span> Coins)</p>
+                            
+                            <form id="redeem-submit-form" onsubmit="submitRedeemRequest(event)" class="mt-4 space-y-3">
+                                <div>
+                                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Your Email Address</label>
+                                    <input type="email" id="redeem-email" required placeholder="name@domain.com" class="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1">Account Phone (Optional)</label>
+                                    <input type="tel" id="redeem-phone" placeholder="+1 (555) 019-2834" class="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div class="flex gap-2 pt-3">
+                                    <button type="button" onclick="closeRedeemForm()" class="flex-1 bg-gray-800 hover:bg-gray-700 text-white font-semibold py-2.5 rounded-xl text-xs transition-colors">
+                                        Cancel
+                                    </button>
+                                    <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition-colors">
+                                        Submit Request
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB: REFERRAL PROGRAM -->
+                <section id="tab-invite" class="tab-content hidden space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Promo Info -->
+                        <div class="glass-card p-6 rounded-3xl flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs bg-indigo-500/15 text-indigo-400 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">Referral Program</span>
+                                <h3 class="font-extrabold text-2xl text-white mt-3">Invite Friends & Earn Big</h3>
+                                <p class="text-xs text-gray-400 mt-2 leading-relaxed">Share Earning Hub with your group! Once a friend signs up and enters your custom code, both of you earn instant gold coins.</p>
+                                
+                                <div class="mt-4 p-4 bg-indigo-950/20 border border-indigo-500/15 rounded-2xl flex items-center justify-between">
+                                    <div>
+                                        <p class="text-[10px] text-indigo-400 font-semibold uppercase tracking-widest">Your Code</p>
+                                        <p class="font-black text-2xl text-white tracking-wider mt-0.5">HUB777</p>
+                                    </div>
+                                    <button onclick="copyReferralCode()" class="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl transition-colors">
+                                        <i data-lucide="copy" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Apply referral code form -->
+                        <div class="glass-card p-6 rounded-3xl">
+                            <span class="text-xs text-indigo-400 font-extrabold uppercase tracking-wider block">Redeem Invite</span>
+                            <h3 class="font-bold text-lg text-white mt-1">Claim Signup Bonus</h3>
+                            <p class="text-xs text-gray-400 mt-1">Received a referral invite? Enter their code below to instantly claim your +250 Coins.</p>
+
+                            <form onsubmit="applyReferralCode(event)" class="mt-4 space-y-3">
+                                <div>
+                                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block mb-1">Referral Code</label>
+                                    <input type="text" id="ref-input-code" required placeholder="E.G. HUB888" class="w-full bg-gray-900 border border-gray-800 rounded-xl px-4 py-2.5 text-sm uppercase text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition-colors">
+                                    Claim Code
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB: HISTORY LEDGER -->
+                <section id="tab-history" class="tab-content hidden space-y-6">
+                    <div>
+                        <h3 class="font-extrabold text-lg tracking-wide text-white flex items-center gap-2 mb-2">
+                            <i data-lucide="history" class="text-indigo-400 w-5 h-5"></i>
+                            Wallet Ledger Logs
+                        </h3>
+                        <p class="text-xs text-gray-400">Review your historical coin gains, game plays, and gift voucher claims.</p>
+                    </div>
+
+                    <div class="glass-card rounded-3xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="border-b border-gray-800 bg-gray-900/35 text-gray-400 text-[11px] font-bold uppercase tracking-wider">
+                                        <th class="py-4 px-6">Source Title</th>
+                                        <th class="py-4 px-6 text-center">Type</th>
+                                        <th class="py-4 px-6 text-right">Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-rows" class="divide-y divide-gray-800/40">
+                                    <!-- Dynamic Transaction rows go here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB: MY PROFILE -->
+                <section id="tab-profile" class="tab-content hidden space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Profile Card -->
+                        <div class="glass-card p-6 rounded-3xl md:col-span-1 flex flex-col items-center text-center">
+                            <div class="relative w-20 h-20 rounded-full bg-indigo-600/20 border-2 border-indigo-500 flex items-center justify-center text-3xl font-extrabold text-indigo-400">
+                                GP
+                            </div>
+                            <h4 class="font-bold text-white text-lg mt-4">Gamer Pro</h4>
+                            <p class="text-xs text-indigo-400 font-semibold uppercase tracking-wider mt-0.5">Level 3 • Active Contributor</p>
+                            
+                            <div class="w-full mt-6 space-y-3 pt-4 border-t border-gray-800/60 text-left text-xs text-gray-400">
+                                <div class="flex justify-between">
+                                    <span>Joined Web</span>
+                                    <span class="text-white font-medium">Jul 4, 2026</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Active Network</span>
+                                    <span class="text-emerald-400 font-semibold">Netlify Connected</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Stats Card -->
+                        <div class="glass-card p-6 rounded-3xl md:col-span-2 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-lg text-white">Progress toward Next Level</h3>
+                                <p class="text-xs text-gray-400 mt-1">Participate in daily blitz campaigns and complete surveys to increase rank.</p>
+                                
+                                <div class="mt-6 space-y-2">
+                                    <div class="flex justify-between text-xs font-semibold">
+                                        <span class="text-indigo-400">Gold Tier Rank</span>
+                                        <span class="text-white">1,250 / 2,500 Exp</span>
+                                    </div>
+                                    <div class="w-full bg-gray-800 h-2.5 rounded-full overflow-hidden">
+                                        <div class="bg-indigo-500 h-full w-1/2"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-gray-800/40">
+                                <div class="bg-gray-900/40 p-4 rounded-2xl border border-gray-800/40">
+                                    <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Completed Quests</span>
+                                    <span class="text-xl font-extrabold text-white mt-1 block" id="profile-completed-quests">8</span>
+                                </div>
+                                <div class="bg-gray-900/40 p-4 rounded-2xl border border-gray-800/40">
+                                    <span class="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Invites Claimed</span>
+                                    <span class="text-xl font-extrabold text-white mt-1 block" id="profile-invites-count">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+        <!-- Bottom Navigation Bar for Mobile Viewport -->
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-[#111420] border-t border-gray-800/60 flex justify-around items-center px-4 z-40">
+            <button onclick="switchTab('earn')" id="mob-nav-earn" class="flex flex-col items-center justify-center text-indigo-400 transition-colors">
+                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                <span class="text-[10px] font-bold mt-0.5">Earn</span>
+            </button>
+            <button onclick="switchTab('arcade')" id="mob-nav-arcade" class="flex flex-col items-center justify-center text-gray-400 transition-colors">
+                <i data-lucide="gamepad-2" class="w-5 h-5"></i>
+                <span class="text-[10px] font-bold mt-0.5">Arcade</span>
+            </button>
+            <button onclick="switchTab('redeem')" id="mob-nav-redeem" class="flex flex-col items-center justify-center text-gray-400 transition-colors">
+                <i data-lucide="gift" class="w-5 h-5"></i>
+                <span class="text-[10px] font-bold mt-0.5">Redeem</span>
+            </button>
+            <button onclick="switchTab('invite')" id="mob-nav-invite" class="flex flex-col items-center justify-center text-gray-400 transition-colors">
+                <i data-lucide="users-2" class="w-5 h-5"></i>
+                <span class="text-[10px] font-bold mt-0.5">Invite</span>
+            </button>
+            <button onclick="switchTab('history')" id="mob-nav-history" class="flex flex-col items-center justify-center text-gray-400 transition-colors">
+                <i data-lucide="history" class="w-5 h-5"></i>
+                <span class="text-[10px] font-bold mt-0.5">History</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- Inject core app.js functionality -->
+    <script src="app.js"></script>
+</body>
+</html>

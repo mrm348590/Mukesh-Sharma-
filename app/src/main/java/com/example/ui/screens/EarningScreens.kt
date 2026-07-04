@@ -11,11 +11,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -146,90 +148,201 @@ fun EarningHubApp(viewModel: EarningViewModel) {
         )
     }
 
-    Scaffold(
-        bottomBar = {
-            NavigationBar(
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .height(72.dp)
-                    .testTag("app_navigation_bar"),
-                containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 6.dp
-            ) {
-                EarningTab.entries.forEach { tab ->
-                    val isSelected = selectedTab == tab
-                    val labelColor by animateColorAsState(
-                        targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                        label = "tabLabel"
-                    )
-                    NavigationBarItem(
-                        selected = isSelected,
-                        onClick = { selectedTab = tab },
-                        icon = {
-                            Icon(
-                                imageVector = tab.icon,
-                                contentDescription = tab.title,
-                                modifier = Modifier.size(24.dp)
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        val isWideScreen = maxWidth >= 720.dp
+
+        Scaffold(
+            bottomBar = {
+                if (!isWideScreen) {
+                    NavigationBar(
+                        modifier = Modifier
+                            .navigationBarsPadding()
+                            .height(72.dp)
+                            .testTag("app_navigation_bar"),
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        tonalElevation = 6.dp
+                    ) {
+                        EarningTab.entries.forEach { tab ->
+                            val isSelected = selectedTab == tab
+                            val labelColor by animateColorAsState(
+                                targetValue = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                label = "tabLabel"
                             )
-                        },
-                        label = {
-                            Text(
-                                text = tab.title,
-                                color = labelColor,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                fontSize = 11.sp
+                            NavigationBarItem(
+                                selected = isSelected,
+                                onClick = { selectedTab = tab },
+                                icon = {
+                                    Icon(
+                                        imageVector = tab.icon,
+                                        contentDescription = tab.title,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        text = tab.title,
+                                        color = labelColor,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                        fontSize = 11.sp
+                                    )
+                                },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                    indicatorColor = MaterialTheme.colorScheme.primary
+                                )
                             )
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                            selectedTextColor = MaterialTheme.colorScheme.primary,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                            indicatorColor = MaterialTheme.colorScheme.primary
-                        )
-                    )
+                        }
+                    }
                 }
-            }
-        },
-        contentWindowInsets = WindowInsets.navigationBars
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.background,
-                            MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
-                        )
-                    )
-                )
-                .padding(innerPadding)
-        ) {
-            Column(
+            },
+            contentWindowInsets = WindowInsets.navigationBars
+        ) { innerPadding ->
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .statusBarsPadding()
-                    .padding(horizontal = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.background,
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+                            )
+                        )
+                    )
+                    .padding(innerPadding)
             ) {
-                // Header Branding Bar
-                HeaderBrandingSection(points = totalPoints)
-
-                // Render Active Content Screen based on selected tab
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .widthIn(max = 600.dp)
-                        .align(Alignment.CenterHorizontally)
+                Row(
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    when (selectedTab) {
-                        EarningTab.EARN -> EarnDashboardScreen(viewModel = viewModel, onWithdrawClick = { selectedTab = EarningTab.REDEEM })
-                        EarningTab.REDEEM -> RedeemCatalogScreen(viewModel = viewModel)
-                        EarningTab.INVITE -> ReferralProgramScreen(viewModel = viewModel)
-                        EarningTab.HISTORY -> TransactionsLedgerScreen(viewModel = viewModel)
-                        EarningTab.PROFILE -> UserProfileScreen(viewModel = viewModel)
+                    // Sidebar Navigation for Wide Web-style Viewport
+                    if (isWideScreen) {
+                        Row(
+                            modifier = Modifier
+                                .width(240.dp)
+                                .fillMaxHeight()
+                                .background(MaterialTheme.colorScheme.surface)
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight()
+                                    .padding(16.dp),
+                                horizontalAlignment = Alignment.Start
+                            ) {
+                                // Logo branding for Sidebar
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(bottom = 24.dp, top = 8.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(32.dp)
+                                            .clip(CircleShape)
+                                            .background(MaterialTheme.colorScheme.primary),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Paid,
+                                            contentDescription = "Hub",
+                                            tint = MaterialTheme.colorScheme.onPrimary,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(
+                                        text = "EARNING HUB",
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = 16.sp,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        letterSpacing = 1.sp
+                                    )
+                                }
+
+                                // Navigation options list
+                                EarningTab.entries.forEach { tab ->
+                                    val isSelected = selectedTab == tab
+                                    val bgColor = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f) else Color.Transparent
+                                    val contentColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 4.dp)
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(bgColor)
+                                            .clickable { selectedTab = tab }
+                                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Icon(
+                                            imageVector = tab.icon,
+                                            contentDescription = tab.title,
+                                            tint = contentColor,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Text(
+                                            text = tab.title,
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                            color = contentColor,
+                                            fontSize = 14.sp
+                                        )
+                                    }
+                                }
+                                
+                                Spacer(modifier = Modifier.weight(1f))
+                                
+                                // Bottom Web Branding info
+                                Text(
+                                    text = "v2.0 Web Portal Active",
+                                    fontSize = 11.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                    modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+                                )
+                            }
+
+                            // Robust sleek 1.dp vertical divider line
+                            Spacer(
+                                modifier = Modifier
+                                    .width(1.dp)
+                                    .fillMaxHeight()
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                            )
+                        }
+                    }
+
+                    // Main Content Panel
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxSize()
+                            .statusBarsPadding()
+                            .padding(horizontal = 20.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        // Header Branding Bar
+                        HeaderBrandingSection(points = totalPoints)
+
+                        // Render Active Content Screen based on selected tab
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth()
+                                .widthIn(max = if (isWideScreen) 900.dp else 600.dp)
+                                .align(Alignment.CenterHorizontally)
+                        ) {
+                            when (selectedTab) {
+                                EarningTab.EARN -> EarnDashboardScreen(viewModel = viewModel, onWithdrawClick = { selectedTab = EarningTab.REDEEM })
+                                EarningTab.REDEEM -> RedeemCatalogScreen(viewModel = viewModel)
+                                EarningTab.INVITE -> ReferralProgramScreen(viewModel = viewModel)
+                                EarningTab.HISTORY -> TransactionsLedgerScreen(viewModel = viewModel)
+                                EarningTab.PROFILE -> UserProfileScreen(viewModel = viewModel)
+                            }
+                        }
                     }
                 }
             }
@@ -1196,7 +1309,7 @@ fun RedeemCatalogScreen(viewModel: EarningViewModel) {
                 val progress = rawProgress.coerceIn(0f, 1f)
 
                 LinearProgressIndicator(
-                    progress = progress,
+                    progress = { progress },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp)
